@@ -11,16 +11,16 @@ import {
   SidebarItem,
 } from '../../components/sidebar';
 import {
-  DirectTab,
   HomeTab,
   SpaceTabs,
+  SpacesTab,
   InboxTab,
-  ExploreTab,
   SettingsTab,
-  UnverifiedTab,
 } from './sidebar';
+
 import { openSearch } from '../../../client/action/navigation';
 import { CreateTab } from './sidebar/CreateTab';
+
 
 export function SidebarNav() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -32,13 +32,12 @@ export function SidebarNav() {
           <Scroll ref={scrollRef} variant="Background" size="0">
             <SidebarStack>
               <HomeTab />
-              <DirectTab />
+              <SpacesTab />
             </SidebarStack>
             <SpaceTabs scrollRef={scrollRef} />
             <SidebarStackSeparator />
             <SidebarStack>
-              <ExploreTab />
-              <CreateTab />
+
             </SidebarStack>
           </Scroll>
         }
@@ -46,23 +45,6 @@ export function SidebarNav() {
           <>
             <SidebarStackSeparator />
             <SidebarStack>
-              <SidebarItem>
-                <SidebarItemTooltip tooltip="Search">
-                  {(triggerRef) => (
-                    <SidebarAvatar
-                      as="button"
-                      ref={triggerRef}
-                      outlined
-                      onClick={() => openSearch()}
-                    >
-                      <Icon src={Icons.Search} />
-                    </SidebarAvatar>
-                  )}
-                </SidebarItemTooltip>
-              </SidebarItem>
-
-              <UnverifiedTab />
-
               <InboxTab />
               <SettingsTab />
             </SidebarStack>

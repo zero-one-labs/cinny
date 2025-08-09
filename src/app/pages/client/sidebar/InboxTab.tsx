@@ -19,6 +19,9 @@ import { useInboxSelected } from '../../../hooks/router/useInbox';
 import { UnreadBadge } from '../../../components/unread-badge';
 import { ScreenSize, useScreenSizeContext } from '../../../hooks/useScreenSize';
 import { useNavToActivePathAtom } from '../../../state/hooks/navToActivePath';
+import { useRoomsUnread } from '../../../state/hooks/unread';
+import { allRoomsAtom } from '../../../state/room-list/roomList';
+import { roomToUnreadAtom } from '../../../state/room/roomToUnread';
 
 export function InboxTab() {
   const screenSize = useScreenSizeContext();
@@ -27,6 +30,8 @@ export function InboxTab() {
   const inboxSelected = useInboxSelected();
   const allInvites = useAtomValue(allInvitesAtom);
   const inviteCount = allInvites.length;
+  const allRooms = useAtomValue(allRoomsAtom);
+  const unread = useRoomsUnread(allRooms, roomToUnreadAtom);
 
   const handleInboxClick = () => {
     if (screenSize === ScreenSize.Mobile) {
@@ -45,16 +50,16 @@ export function InboxTab() {
 
   return (
     <SidebarItem active={inboxSelected}>
-      <SidebarItemTooltip tooltip="Inbox">
+      <SidebarItemTooltip tooltip="Activity">
         {(triggerRef) => (
           <SidebarAvatar as="button" ref={triggerRef} outlined onClick={handleInboxClick}>
-            <Icon src={Icons.Inbox} filled={inboxSelected} />
+            <Icon src={Icons.Bell} filled={inboxSelected} />
           </SidebarAvatar>
         )}
       </SidebarItemTooltip>
-      {inviteCount > 0 && (
+      {unread && (unread.highlight > 0 || unread.total > 0) && (
         <SidebarItemBadge hasCount>
-          <UnreadBadge highlight count={inviteCount} />
+          <UnreadBadge highlight={unread.highlight > 0} count={unread.total} />
         </SidebarItemBadge>
       )}
     </SidebarItem>

@@ -19,6 +19,15 @@ import {
   REGISTER_PATH,
   RESET_PASSWORD_PATH,
   SPACE_PATH,
+  SPACES_PATH,
+  SETTINGS_PATH,
+  SETTINGS_GENERAL_PATH,
+  SETTINGS_ACCOUNT_PATH,
+  SETTINGS_NOTIFICATIONS_PATH,
+  SETTINGS_DEVICES_PATH,
+  SETTINGS_EMOJIS_PATH,
+  SETTINGS_DEVELOPER_PATH,
+  SETTINGS_ABOUT_PATH,
   _CREATE_PATH,
   _FEATURED_PATH,
   _INVITES_PATH,
@@ -46,6 +55,15 @@ import { Direct, DirectCreate, DirectRouteRoomProvider } from './client/direct';
 import { RouteSpaceProvider, Space, SpaceRouteRoomProvider, SpaceSearch } from './client/space';
 import { Explore, FeaturedRooms, PublicRooms } from './client/explore';
 import { Notifications, Inbox, Invites } from './client/inbox';
+import { Spaces } from './client/spaces';
+import { Settings } from './client/settings';
+import { General } from '../features/settings/general';
+import { Account } from '../features/settings/account';
+import { Notifications as SettingsNotifications } from '../features/settings/notifications';
+import { Devices } from '../features/settings/devices';
+import { EmojisStickers } from '../features/settings/emojis-stickers';
+import { DeveloperTools } from '../features/settings/developer-tools';
+import { About } from '../features/settings/about';
 import { setAfterLoginRedirectPath } from './afterLoginRedirectPath';
 import { Room } from '../features/room';
 import { Lobby } from '../features/lobby';
@@ -161,7 +179,9 @@ export const createRouter = (clientConfig: ClientConfig, screenSize: ScreenSize)
           }
         >
           {mobile ? null : <Route index element={<WelcomePage />} />}
+
           <Route path={_CREATE_PATH} element={<HomeCreateRoom />} />
+
           <Route path={_JOIN_PATH} element={<p>join</p>} />
           <Route path={_SEARCH_PATH} element={<HomeSearch />} />
           <Route
@@ -220,7 +240,9 @@ export const createRouter = (clientConfig: ClientConfig, screenSize: ScreenSize)
               loader={({ params }) => {
                 const { spaceIdOrAlias } = params;
                 if (spaceIdOrAlias) {
-                  return redirect(getSpaceLobbyPath(spaceIdOrAlias));
+                  // Decode the URI component since we encode it in getSpaceLobbyPath
+                  const decodedSpaceIdOrAlias = decodeURIComponent(spaceIdOrAlias);
+                  return redirect(getSpaceLobbyPath(decodedSpaceIdOrAlias));
                 }
                 return null;
               }}
@@ -263,6 +285,42 @@ export const createRouter = (clientConfig: ClientConfig, screenSize: ScreenSize)
           <Route path={_SERVER_PATH} element={<PublicRooms />} />
         </Route>
         <Route path={CREATE_PATH} element={<Create />} />
+        <Route
+          path={SPACES_PATH}
+          element={
+            <PageRoot
+              nav={
+                <MobileFriendlyPageNav path={SPACES_PATH}>
+                  <Spaces />
+                </MobileFriendlyPageNav>
+              }
+            >
+              <Outlet />
+            </PageRoot>
+          }
+        />
+        <Route
+          path={SETTINGS_PATH}
+          element={
+            <PageRoot
+              nav={
+                <MobileFriendlyPageNav path={SETTINGS_PATH}>
+                  <Settings />
+                </MobileFriendlyPageNav>
+              }
+            >
+              <Outlet />
+            </PageRoot>
+          }
+        >
+          <Route path={SETTINGS_GENERAL_PATH} element={<General requestClose={() => {}} />} />
+          <Route path={SETTINGS_ACCOUNT_PATH} element={<Account requestClose={() => {}} />} />
+          <Route path={SETTINGS_NOTIFICATIONS_PATH} element={<SettingsNotifications requestClose={() => {}} />} />
+          <Route path={SETTINGS_DEVICES_PATH} element={<Devices requestClose={() => {}} />} />
+          <Route path={SETTINGS_EMOJIS_PATH} element={<EmojisStickers requestClose={() => {}} />} />
+          <Route path={SETTINGS_DEVELOPER_PATH} element={<DeveloperTools requestClose={() => {}} />} />
+          <Route path={SETTINGS_ABOUT_PATH} element={<About requestClose={() => {}} />} />
+        </Route>
         <Route
           path={INBOX_PATH}
           element={

@@ -1,4 +1,19 @@
 /* eslint-disable import/first */
+// Object.assign polyfill for older browsers and linkify-react compatibility
+if (!Object.assign) {
+  Object.assign = function(target: any, ...sources: any[]) {
+    for (let i = 0; i < sources.length; i++) {
+      const source = sources[i];
+      for (const key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
+}
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { enableMapSet } from 'immer';
@@ -47,6 +62,19 @@ const mountApp = () => {
   }
 
   const root = createRoot(rootContainer);
+  
+  // Try simple render first
+  if (window.location.search.includes('simple')) {
+    root.render(
+      <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+        <h1>Cinny App</h1>
+        <p>Simple mode - bypassing complex components</p>
+        <p>If you see this, React and the basic setup is working!</p>
+      </div>
+    );
+    return;
+  }
+  
   root.render(<App />);
 };
 

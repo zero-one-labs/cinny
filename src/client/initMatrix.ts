@@ -12,12 +12,12 @@ type Session = {
 
 export const initClient = async (session: Session): Promise<MatrixClient> => {
   const indexedDBStore = new IndexedDBStore({
-    indexedDB: global.indexedDB,
-    localStorage: global.localStorage,
+    indexedDB: globalThis.indexedDB || window.indexedDB,
+    localStorage: globalThis.localStorage || window.localStorage,
     dbName: 'web-sync-store',
   });
 
-  const legacyCryptoStore = new IndexedDBCryptoStore(global.indexedDB, 'crypto-store');
+  const legacyCryptoStore = new IndexedDBCryptoStore(globalThis.indexedDB || window.indexedDB, 'crypto-store');
 
   const mx = createClient({
     baseUrl: session.baseUrl,
