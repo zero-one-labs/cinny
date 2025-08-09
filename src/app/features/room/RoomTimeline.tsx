@@ -98,6 +98,7 @@ import {
 import { markAsRead } from '../../../client/action/notifications';
 import { useDebounce } from '../../hooks/useDebounce';
 import { getResizeObserverEntry, useResizeObserver } from '../../hooks/useResizeObserver';
+import { ScreenSize, useScreenSizeContext } from '../../hooks/useScreenSize';
 import * as css from './RoomTimeline.css';
 import { inSameDay, minuteDifference, timeDayMonthYear, today, yesterday } from '../../utils/time';
 import { createMentionElement, isEmptyEditor, moveCursor } from '../../components/editor';
@@ -449,6 +450,7 @@ export function RoomTimeline({
   const showUrlPreview = room.hasEncryptionStateEvent() ? encUrlPreview : urlPreview;
   const [showHiddenEvents] = useSetting(settingsAtom, 'showHiddenEvents');
   const [showDeveloperTools] = useSetting(settingsAtom, 'developerTools');
+  const screenSize = useScreenSizeContext();
 
   const [hour24Clock] = useSetting(settingsAtom, 'hour24Clock');
   const [dateFormatString] = useSetting(settingsAtom, 'dateFormatString');
@@ -491,6 +493,7 @@ export function RoomTimeline({
     count: 0,
     smooth: true,
   });
+
 
   const [focusItem, setFocusItem] = useState<
     | {
@@ -542,6 +545,7 @@ export function RoomTimeline({
     setTimeline,
     PAGINATION_LIMIT
   );
+
 
   const getScrollElement = useCallback(() => scrollRef.current, []);
 
@@ -1677,18 +1681,17 @@ export function RoomTimeline({
           </Chip>
         </TimelineFloat>
       )}
-      <Scroll ref={scrollRef} visibility="Hover">
+      <Box style={{ position: 'relative', width: '100%' }}>
+        <Scroll ref={scrollRef} visibility="Hover" style={{ width: '100%' }}>
         <Box
           direction="Column"
           justifyContent="End"
-          style={{ minHeight: '100%', padding: `${config.space.S600} 0` }}
+          style={{ minHeight: '100%', width: '100%', padding: `${config.space.S600} ${config.space.S200}` }}
         >
           {!canPaginateBack && rangeAtStart && getItems().length > 0 && (
             <div
               style={{
-                padding: `${config.space.S700} ${config.space.S400} ${config.space.S600} ${
-                  messageLayout === MessageLayout.Compact ? config.space.S400 : toRem(64)
-                }`,
+                padding: `${config.space.S700} 0 ${config.space.S600} 0`,
               }}
             >
               <RoomIntro room={room} />
@@ -1763,7 +1766,8 @@ export function RoomTimeline({
             ))}
           <span ref={atBottomAnchorRef} />
         </Box>
-      </Scroll>
+        </Scroll>
+      </Box>
       {!atBottom && (
         <TimelineFloat position="Bottom">
           <Chip

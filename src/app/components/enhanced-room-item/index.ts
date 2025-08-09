@@ -1,0 +1,1 @@
+export { EnhancedRoomItem } from './EnhancedRoomItem';

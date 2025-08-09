@@ -86,3 +86,13 @@ export const INBOX_INVITES_PATH = `/inbox/${_INVITES_PATH}`;
 export const SPACE_SETTINGS_PATH = '/space-settings/';
 
 export const ROOM_SETTINGS_PATH = '/room-settings/';
+
+export const SPACES_PATH = '/spaces/';
+export const SETTINGS_PATH = '/settings/';
+export const SETTINGS_GENERAL_PATH = '/settings/general/';
+export const SETTINGS_ACCOUNT_PATH = '/settings/account/';
+export const SETTINGS_NOTIFICATIONS_PATH = '/settings/notifications/';
+export const SETTINGS_DEVICES_PATH = '/settings/devices/';
+export const SETTINGS_EMOJIS_PATH = '/settings/emojis/';
+export const SETTINGS_DEVELOPER_PATH = '/settings/developer/';
+export const SETTINGS_ABOUT_PATH = '/settings/about/';

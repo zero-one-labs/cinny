@@ -65,6 +65,7 @@ function InaccessibleSpaceProfile({ roomId, suggested }: InaccessibleSpaceProfil
         <Avatar size="200" radii="300">
           <RoomAvatar
             roomId={roomId}
+            circular={false}
             renderFallback={() => (
               <Text as="span" size="H6">
                 U
@@ -126,6 +127,7 @@ function UnjoinedSpaceProfile({
             roomId={roomId}
             src={avatarUrl}
             alt={name}
+            circular={false}
             renderFallback={() => (
               <Text as="span" size="H6">
                 {nameInitials(name)}
@@ -190,6 +192,7 @@ function SpaceProfile({
             roomId={roomId}
             src={avatarUrl}
             alt={name}
+            circular={false}
             renderFallback={() => (
               <Text as="span" size="H6">
                 {nameInitials(name)}

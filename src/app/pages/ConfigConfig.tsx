@@ -5,9 +5,9 @@ import { SplashScreen } from '../components/splash-screen';
 export function ConfigConfigLoading() {
   return (
     <SplashScreen>
-      <Box grow="Yes" direction="Column" gap="400" alignItems="Center" justifyContent="Center">
+      <Box grow="Yes" direction="Column" gap="400" alignItems="Center" justifyContent="Center" style={{ minHeight: '100vh' }}>
         <Spinner variant="Secondary" size="600" />
-        <Text>Heating up</Text>
+        <Text style={{ color: '#000' }}>Heating up</Text>
       </Box>
     </SplashScreen>
   );

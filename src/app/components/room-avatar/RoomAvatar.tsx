@@ -10,8 +10,9 @@ type RoomAvatarProps = {
   src?: string;
   alt?: string;
   renderFallback: () => ReactNode;
+  circular?: boolean;
 };
-export function RoomAvatar({ roomId, src, alt, renderFallback }: RoomAvatarProps) {
+export function RoomAvatar({ roomId, src, alt, renderFallback, circular = true }: RoomAvatarProps) {
   const [error, setError] = useState(false);
 
   const handleLoad: ReactEventHandler<HTMLImageElement> = (evt) => {
@@ -23,6 +24,7 @@ export function RoomAvatar({ roomId, src, alt, renderFallback }: RoomAvatarProps
       <AvatarFallback
         style={{ backgroundColor: colorMXID(roomId ?? ''), color: color.Surface.Container }}
         className={css.RoomAvatar}
+        data-circular={circular}
       >
         {renderFallback()}
       </AvatarFallback>
@@ -32,6 +34,7 @@ export function RoomAvatar({ roomId, src, alt, renderFallback }: RoomAvatarProps
   return (
     <AvatarImage
       className={css.RoomAvatar}
+      data-circular={circular}
       src={src}
       alt={alt}
       onError={() => setError(true)}

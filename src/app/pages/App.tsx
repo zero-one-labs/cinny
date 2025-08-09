@@ -2,7 +2,6 @@ import React from 'react';
 import { Provider as JotaiProvider } from 'jotai';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { ClientConfigLoader } from '../components/ClientConfigLoader';
 import { ClientConfigProvider } from '../hooks/useClientConfig';
@@ -15,7 +14,18 @@ const queryClient = new QueryClient();
 
 function App() {
   const screenSize = useScreenSize();
-
+  
+  // Temporary debug render
+  if (window.location.search.includes('debug')) {
+    return (
+      <div style={{ padding: '20px', backgroundColor: '#f0f0f0', color: '#000' }}>
+        <h1>Cinny Debug Mode</h1>
+        <p>React is working!</p>
+        <p>Screen size: {JSON.stringify(screenSize)}</p>
+      </div>
+    );
+  }
+  
   return (
     <ScreenSizeProvider value={screenSize}>
       <FeatureCheck>
@@ -31,7 +41,6 @@ function App() {
                 <JotaiProvider>
                   <RouterProvider router={createRouter(clientConfig, screenSize)} />
                 </JotaiProvider>
-                <ReactQueryDevtools initialIsOpen={false} />
               </QueryClientProvider>
             </ClientConfigProvider>
           )}

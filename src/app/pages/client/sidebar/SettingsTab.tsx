@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Text } from 'folds';
 import { SidebarItem, SidebarItemTooltip, SidebarAvatar } from '../../../components/sidebar';
 import { UserAvatar } from '../../../components/user-avatar';
@@ -6,28 +7,28 @@ import { useMatrixClient } from '../../../hooks/useMatrixClient';
 import { getMxIdLocalPart, mxcUrlToHttp } from '../../../utils/matrix';
 import { nameInitials } from '../../../utils/common';
 import { useMediaAuthentication } from '../../../hooks/useMediaAuthentication';
-import { Settings } from '../../../features/settings';
 import { useUserProfile } from '../../../hooks/useUserProfile';
-import { Modal500 } from '../../../components/Modal500';
+import { getSettingsPath } from '../../pathUtils';
 
 export function SettingsTab() {
+  const navigate = useNavigate();
   const mx = useMatrixClient();
   const useAuthentication = useMediaAuthentication();
   const userId = mx.getUserId()!;
   const profile = useUserProfile(userId);
-
-  const [settings, setSettings] = useState(false);
 
   const displayName = profile.displayName ?? getMxIdLocalPart(userId) ?? userId;
   const avatarUrl = profile.avatarUrl
     ? mxcUrlToHttp(mx, profile.avatarUrl, useAuthentication, 96, 96, 'crop') ?? undefined
     : undefined;
 
-  const openSettings = () => setSettings(true);
-  const closeSettings = () => setSettings(false);
+  // Check if we're currently on the settings page
+  const isSettingsActive = window.location.pathname.includes('/settings');
+
+  const openSettings = () => navigate(getSettingsPath());
 
   return (
-    <SidebarItem active={settings}>
+    <SidebarItem active={isSettingsActive}>
       <SidebarItemTooltip tooltip={displayName}>
         {(triggerRef) => (
           <SidebarAvatar as="button" ref={triggerRef} onClick={openSettings}>
@@ -39,11 +40,6 @@ export function SettingsTab() {
           </SidebarAvatar>
         )}
       </SidebarItemTooltip>
-      {settings && (
-        <Modal500 requestClose={closeSettings}>
-          <Settings requestClose={closeSettings} />
-        </Modal500>
-      )}
     </SidebarItem>
   );
 }

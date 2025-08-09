@@ -434,6 +434,7 @@ function SpaceTab({
                 data-id={space.roomId}
                 ref={triggerRef}
                 size={folder ? '300' : '400'}
+                radii="300"
                 onClick={onClick}
                 onContextMenu={handleContextMenu}
               >
@@ -441,6 +442,7 @@ function SpaceTab({
                   roomId={space.roomId}
                   src={getRoomAvatarUrl(mx, space, 96, useAuthentication) ?? undefined}
                   alt={space.name}
+                  circular={false}
                   renderFallback={() => (
                     <Text size={folder ? 'H6' : 'H4'}>{nameInitials(space.name, 2)}</Text>
                   )}
@@ -567,6 +569,7 @@ function ClosedSpaceFolder({
                         roomId={space.roomId}
                         src={getRoomAvatarUrl(mx, space, 96, useAuthentication) ?? undefined}
                         alt={space.name}
+                        circular={false}
                         renderFallback={() => (
                           <Text size="Inherit">
                             <b>{nameInitials(space.name, 2)}</b>

@@ -22,6 +22,15 @@ import {
   SPACE_PATH,
   SPACE_ROOM_PATH,
   SPACE_SEARCH_PATH,
+  SPACES_PATH,
+  SETTINGS_PATH,
+  SETTINGS_GENERAL_PATH,
+  SETTINGS_ACCOUNT_PATH,
+  SETTINGS_NOTIFICATIONS_PATH,
+  SETTINGS_DEVICES_PATH,
+  SETTINGS_EMOJIS_PATH,
+  SETTINGS_DEVELOPER_PATH,
+  SETTINGS_ABOUT_PATH,
 } from './paths';
 import { trimLeadingSlash, trimTrailingSlash } from '../utils/common';
 import { HashRouterConfig } from '../hooks/useClientConfig';
@@ -111,11 +120,15 @@ export const getDirectRoomPath = (roomIdOrAlias: string, eventId?: string): stri
 };
 
 export const getSpacePath = (spaceIdOrAlias: string): string => {
+  // Matrix IDs need to be URI encoded to work properly in URL paths
+  // Special characters like :, !, . break routing without encoding
   const params = {
     spaceIdOrAlias: encodeURIComponent(spaceIdOrAlias),
   };
 
-  return generatePath(SPACE_PATH, params);
+  const result = generatePath(SPACE_PATH, params);
+  
+  return result;
 };
 export const getSpaceLobbyPath = (spaceIdOrAlias: string): string => {
   const params = {
@@ -155,3 +168,13 @@ export const getExploreServerPath = (server: string): string => {
 export const getInboxPath = (): string => INBOX_PATH;
 export const getInboxNotificationsPath = (): string => INBOX_NOTIFICATIONS_PATH;
 export const getInboxInvitesPath = (): string => INBOX_INVITES_PATH;
+
+export const getSpacesPath = (): string => SPACES_PATH;
+export const getSettingsPath = (): string => SETTINGS_PATH;
+export const getSettingsGeneralPath = (): string => SETTINGS_GENERAL_PATH;
+export const getSettingsAccountPath = (): string => SETTINGS_ACCOUNT_PATH;
+export const getSettingsNotificationsPath = (): string => SETTINGS_NOTIFICATIONS_PATH;
+export const getSettingsDevicesPath = (): string => SETTINGS_DEVICES_PATH;
+export const getSettingsEmojisPath = (): string => SETTINGS_EMOJIS_PATH;
+export const getSettingsDeveloperPath = (): string => SETTINGS_DEVELOPER_PATH;
+export const getSettingsAboutPath = (): string => SETTINGS_ABOUT_PATH;

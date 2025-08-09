@@ -8,10 +8,13 @@ export const useSelectedSpace = (): string | undefined => {
 
   const { spaceIdOrAlias } = useParams();
 
+  // Decode the URI component since we encode it in path generation
+  const decodedSpaceIdOrAlias = spaceIdOrAlias ? decodeURIComponent(spaceIdOrAlias) : undefined;
+
   const spaceId =
-    spaceIdOrAlias && isRoomAlias(spaceIdOrAlias)
-      ? getCanonicalAliasRoomId(mx, spaceIdOrAlias)
-      : spaceIdOrAlias;
+    decodedSpaceIdOrAlias && isRoomAlias(decodedSpaceIdOrAlias)
+      ? getCanonicalAliasRoomId(mx, decodedSpaceIdOrAlias)
+      : decodedSpaceIdOrAlias;
 
   return spaceId;
 };

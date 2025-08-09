@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Icon, Icons, Menu, MenuItem, PopOut, RectCords, Text, config, toRem } from 'folds';
 import { useAtomValue } from 'jotai';
 import FocusTrap from 'focus-trap-react';
-import { useOrphanRooms } from '../../../state/hooks/roomList';
+import { useOrphanRooms, useDirects } from '../../../state/hooks/roomList';
 import { useMatrixClient } from '../../../hooks/useMatrixClient';
 import { mDirectAtom } from '../../../state/mDirectList';
 import { roomToParentsAtom } from '../../../state/room/roomToParents';
@@ -32,13 +32,17 @@ type HomeMenuProps = {
 };
 const HomeMenu = forwardRef<HTMLDivElement, HomeMenuProps>(({ requestClose }, ref) => {
   const orphanRooms = useHomeRooms();
-  const [hideActivity] = useSetting(settingsAtom, 'hideActivity');
-  const unread = useRoomsUnread(orphanRooms, roomToUnreadAtom);
   const mx = useMatrixClient();
+  const mDirects = useAtomValue(mDirectAtom);
+  const directs = useDirects(mx, allRoomsAtom, mDirects);
+  const [hideActivity] = useSetting(settingsAtom, 'hideActivity');
+  const orphanUnread = useRoomsUnread(orphanRooms, roomToUnreadAtom);
+  const directUnread = useRoomsUnread(directs, roomToUnreadAtom);
 
   const handleMarkAsRead = () => {
-    if (!unread) return;
+    if (!orphanUnread && !directUnread) return;
     orphanRooms.forEach((rId) => markAsRead(mx, rId, hideActivity));
+    directs.forEach((rId) => markAsRead(mx, rId, hideActivity));
     requestClose();
   };
 
@@ -50,7 +54,7 @@ const HomeMenu = forwardRef<HTMLDivElement, HomeMenuProps>(({ requestClose }, re
           size="300"
           after={<Icon size="100" src={Icons.CheckTwice} />}
           radii="300"
-          aria-disabled={!unread}
+          aria-disabled={!orphanUnread && !directUnread}
         >
           <Text style={{ flexGrow: 1 }} as="span" size="T300" truncate>
             Mark as Read
@@ -70,7 +74,17 @@ export function HomeTab() {
   const mDirects = useAtomValue(mDirectAtom);
   const roomToParents = useAtomValue(roomToParentsAtom);
   const orphanRooms = useOrphanRooms(mx, allRoomsAtom, mDirects, roomToParents);
-  const homeUnread = useRoomsUnread(orphanRooms, roomToUnreadAtom);
+  const directs = useDirects(mx, allRoomsAtom, mDirects);
+  const orphanUnread = useRoomsUnread(orphanRooms, roomToUnreadAtom);
+  const directUnread = useRoomsUnread(directs, roomToUnreadAtom);
+  
+  // Combine unread counts for home tab
+  const homeUnread = {
+    total: (orphanUnread?.total || 0) + (directUnread?.total || 0),
+    highlight: (orphanUnread?.highlight || 0) + (directUnread?.highlight || 0),
+  };
+  const hasUnread = homeUnread.total > 0 || homeUnread.highlight > 0;
+  
   const homeSelected = useHomeSelected();
   const [menuAnchor, setMenuAnchor] = useState<RectCords>();
 
@@ -108,7 +122,7 @@ export function HomeTab() {
           </SidebarAvatar>
         )}
       </SidebarItemTooltip>
-      {homeUnread && (
+      {hasUnread && (
         <SidebarItemBadge hasCount={homeUnread.total > 0}>
           <UnreadBadge highlight={homeUnread.highlight > 0} count={homeUnread.total} />
         </SidebarItemBadge>

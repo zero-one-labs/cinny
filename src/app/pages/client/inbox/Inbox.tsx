@@ -11,6 +11,7 @@ import { UnreadBadge } from '../../../components/unread-badge';
 import { allInvitesAtom } from '../../../state/room-list/inviteList';
 import { useNavToActivePathMapper } from '../../../hooks/useNavToActivePathMapper';
 import { PageNav, PageNavContent, PageNavHeader } from '../../../components/page';
+import { ScreenSize, useScreenSizeContext } from '../../../hooks/useScreenSize';
 
 function InvitesNavItem() {
   const invitesSelected = useInboxInvitesSelected();
@@ -46,6 +47,8 @@ function InvitesNavItem() {
 export function Inbox() {
   useNavToActivePathMapper('inbox');
   const notificationsSelected = useInboxNotificationsSelected();
+  const screenSize = useScreenSizeContext();
+  const isMobile = screenSize === ScreenSize.Mobile;
 
   return (
     <PageNav>
@@ -53,7 +56,7 @@ export function Inbox() {
         <Box grow="Yes" gap="300">
           <Box grow="Yes">
             <Text size="H4" truncate>
-              Inbox
+              Activity
             </Text>
           </Box>
         </Box>

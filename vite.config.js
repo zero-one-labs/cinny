@@ -10,6 +10,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import fs from 'fs';
 import path from 'path';
 import buildConfig from './build.config';
+import fixLinkifyPlugin from './vite-plugin-fix-linkify';
 
 const copyFiles = {
   targets: [
@@ -73,13 +74,18 @@ export default defineConfig({
   base: buildConfig.base,
   server: {
     port: 8080,
-    host: true,
+    host: '0.0.0.0', // Allow access from network devices
+    strictPort: true,
     fs: {
       // Allow serving files from one level up to the project root
       allow: ['..'],
     },
+    hmr: {
+      port: 8080,
+    },
   },
   plugins: [
+    fixLinkifyPlugin(),
     serverMatrixSdkCryptoWasm('/node_modules/.vite/deps/pkg/matrix_sdk_crypto_wasm_bg.wasm'),
     topLevelAwait({
       // The export name of top-level await promise for each chunk module
@@ -88,8 +94,8 @@ export default defineConfig({
       promiseImportName: (i) => `__tla_${i}`,
     }),
     viteStaticCopy(copyFiles),
-    vanillaExtractPlugin(),
     wasm(),
+    vanillaExtractPlugin(),
     react(),
     VitePWA({
       srcDir: 'src',
@@ -107,6 +113,8 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
+    include: ['linkify-react', 'linkifyjs'],
+    exclude: ['folds'],
     esbuildOptions: {
       define: {
         global: 'globalThis',
@@ -117,6 +125,29 @@ export default defineConfig({
           process: false,
           buffer: true,
         }),
+        // Fix linkify issues during optimization
+        {
+          name: 'esbuild-fix-linkify',
+          setup(build) {
+            build.onLoad({ filter: /linkify/ }, async (args) => {
+              const fs = await import('fs');
+              let contents = await fs.promises.readFile(args.path, 'utf8');
+              
+              // Apply the same fixes during dependency optimization
+              if (contents.includes('options.assign(')) {
+                contents = contents.replace(/\boptions\.assign\(/g, 'Object.assign(');
+                console.log(`[esbuild-fix-linkify] Fixed options.assign in: ${args.path}`);
+              }
+              
+              if (contents.includes('.assign(') && !contents.includes('Object.assign(')) {
+                contents = contents.replace(/(\w+)\.assign\s*\(/g, 'Object.assign(');
+                console.log(`[esbuild-fix-linkify] Fixed .assign calls in: ${args.path}`);
+              }
+              
+              return { contents, loader: 'js' };
+            });
+          }
+        }
       ],
     },
   },
@@ -124,8 +155,78 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
     copyPublicDir: false,
+    minify: false,
     rollupOptions: {
-      plugins: [inject({ Buffer: ['buffer', 'Buffer'] })],
+      plugins: [
+        inject({ 
+          Buffer: ['buffer', 'Buffer']
+        }),
+        // Also add the fix plugin to rollup - more comprehensive
+        {
+          name: 'rollup-fix-linkify',
+          transform(code, id) {
+            // Only process linkify-related files
+            if (!id.includes('linkify') && !code.includes('linkify') && !code.includes('Linkify')) {
+              return null;
+            }
+            
+            let hasChanges = false;
+            let transformed = code;
+            
+            // Fix options.assign pattern first
+            if (code.includes('options.assign(')) {
+              transformed = transformed.replace(/\boptions\.assign\(/g, 'Object.assign(');
+              hasChanges = true;
+              console.log(`[rollup-fix-linkify] Fixed options.assign in: ${id}`);
+            }
+            
+            // Fix any other .assign calls that aren't Object.assign
+            if (code.includes('.assign(') && !transformed.includes('Object.assign(')) {
+              transformed = transformed.replace(/(\w+)\.assign\s*\(/g, 'Object.assign(');
+              hasChanges = true;
+              console.log(`[rollup-fix-linkify] Fixed .assign calls in: ${id}`);
+            }
+            
+            // Add Object.assign polyfill if we made changes
+            if (hasChanges && !code.includes('Object.assign')) {
+              const polyfill = `
+// Object.assign polyfill for linkify-react compatibility
+if (typeof Object.assign !== 'function') {
+  Object.assign = function(target) {
+    'use strict';
+    if (target == null) {
+      throw new TypeError('Cannot convert undefined or null to object');
+    }
+    var to = Object(target);
+    for (var index = 1; index < arguments.length; index++) {
+      var nextSource = arguments[index];
+      if (nextSource != null) {
+        for (var nextKey in nextSource) {
+          if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+            to[nextKey] = nextSource[nextKey];
+          }
+        }
+      }
+    }
+    return to;
+  };
+}
+`;
+              transformed = polyfill + '\n' + transformed;
+              console.log(`[rollup-fix-linkify] Added Object.assign polyfill to: ${id}`);
+            }
+            
+            if (hasChanges) {
+              return {
+                code: transformed,
+                map: null
+              };
+            }
+            
+            return null;
+          }
+        }
+      ]
     },
   },
 });
