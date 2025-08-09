@@ -17,7 +17,10 @@ import {
   InboxTab,
   SettingsTab,
 } from './sidebar';
-import { openCreateRoom } from '../../../client/action/navigation';
+
+import { openSearch } from '../../../client/action/navigation';
+import { CreateTab } from './sidebar/CreateTab';
+
 
 export function SidebarNav() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -34,20 +37,7 @@ export function SidebarNav() {
             <SpaceTabs scrollRef={scrollRef} />
             <SidebarStackSeparator />
             <SidebarStack>
-              <SidebarItem>
-                <SidebarItemTooltip tooltip="Create Space">
-                  {(triggerRef) => (
-                    <SidebarAvatar
-                      as="button"
-                      ref={triggerRef}
-                      outlined
-                      onClick={() => openCreateRoom(true)}
-                    >
-                      <Icon src={Icons.Plus} />
-                    </SidebarAvatar>
-                  )}
-                </SidebarItemTooltip>
-              </SidebarItem>
+
             </SidebarStack>
           </Scroll>
         }

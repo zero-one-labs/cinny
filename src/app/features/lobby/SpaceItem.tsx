@@ -30,10 +30,12 @@ import { AsyncStatus, useAsyncCallback } from '../../hooks/useAsyncCallback';
 import * as css from './SpaceItem.css';
 import * as styleCss from './style.css';
 import { useDraggableItem } from './DnD';
-import { openCreateRoom, openSpaceAddExisting } from '../../../client/action/navigation';
+import { openSpaceAddExisting } from '../../../client/action/navigation';
 import { stopPropagation } from '../../utils/keyboard';
 import { mxcUrlToHttp } from '../../utils/matrix';
 import { useMediaAuthentication } from '../../hooks/useMediaAuthentication';
+import { useOpenCreateRoomModal } from '../../state/hooks/createRoomModal';
+import { useOpenCreateSpaceModal } from '../../state/hooks/createSpaceModal';
 
 function SpaceProfileLoading() {
   return (
@@ -243,13 +245,14 @@ function RootSpaceProfile({ closed, categoryId, handleClose }: RootSpaceProfileP
 
 function AddRoomButton({ item }: { item: HierarchyItem }) {
   const [cords, setCords] = useState<RectCords>();
+  const openCreateRoomModal = useOpenCreateRoomModal();
 
   const handleAddRoom: MouseEventHandler<HTMLButtonElement> = (evt) => {
     setCords(evt.currentTarget.getBoundingClientRect());
   };
 
   const handleCreateRoom = () => {
-    openCreateRoom(false, item.roomId as any);
+    openCreateRoomModal(item.roomId);
     setCords(undefined);
   };
 
@@ -274,7 +277,7 @@ function AddRoomButton({ item }: { item: HierarchyItem }) {
             escapeDeactivates: stopPropagation,
           }}
         >
-          <Menu style={{ padding: config.space.S200 }}>
+          <Menu style={{ padding: config.space.S100 }}>
             <MenuItem
               size="300"
               radii="300"
@@ -306,13 +309,14 @@ function AddRoomButton({ item }: { item: HierarchyItem }) {
 
 function AddSpaceButton({ item }: { item: HierarchyItem }) {
   const [cords, setCords] = useState<RectCords>();
+  const openCreateSpaceModal = useOpenCreateSpaceModal();
 
   const handleAddSpace: MouseEventHandler<HTMLButtonElement> = (evt) => {
     setCords(evt.currentTarget.getBoundingClientRect());
   };
 
   const handleCreateSpace = () => {
-    openCreateRoom(true, item.roomId as any);
+    openCreateSpaceModal(item.roomId as any);
     setCords(undefined);
   };
 
@@ -336,7 +340,7 @@ function AddSpaceButton({ item }: { item: HierarchyItem }) {
             escapeDeactivates: stopPropagation,
           }}
         >
-          <Menu style={{ padding: config.space.S200 }}>
+          <Menu style={{ padding: config.space.S100 }}>
             <MenuItem
               size="300"
               radii="300"
@@ -473,7 +477,7 @@ export const SpaceItemCard = as<'div', SpaceItemCardProps>(
               </>
             )}
           </Box>
-          {canEditChild && (
+          {space && canEditChild && (
             <Box shrink="No" alignItems="Inherit" gap="200">
               <AddRoomButton item={item} />
               {item.parentId === undefined && <AddSpaceButton item={item} />}

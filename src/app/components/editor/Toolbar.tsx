@@ -155,7 +155,7 @@ export function HeadingBlockButton() {
             escapeDeactivates: stopPropagation,
           }}
         >
-          <Menu style={{ padding: config.space.S200 }}>
+          <Menu style={{ padding: config.space.S100 }}>
             <Box gap="100">
               <TooltipProvider
                 tooltip={<BtnTooltip text="Heading 1" shortCode={`${modKey} + 1`} />}
@@ -339,7 +339,7 @@ export function Toolbar() {
           <Box className={css.MarkdownBtnBox} shrink="No" grow="Yes" justifyContent="End">
             <TooltipProvider
               align="End"
-              tooltip={<BtnTooltip text="Toggle Markdown" />}
+              tooltip={<BtnTooltip text={isMarkdown ? 'Disable Markdown' : 'Enable Markdown'} />}
               delay={500}
             >
               {(triggerRef) => (

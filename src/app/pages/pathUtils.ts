@@ -22,15 +22,9 @@ import {
   SPACE_PATH,
   SPACE_ROOM_PATH,
   SPACE_SEARCH_PATH,
-  SPACES_PATH,
-  SETTINGS_PATH,
-  SETTINGS_GENERAL_PATH,
-  SETTINGS_ACCOUNT_PATH,
-  SETTINGS_NOTIFICATIONS_PATH,
-  SETTINGS_DEVICES_PATH,
-  SETTINGS_EMOJIS_PATH,
-  SETTINGS_DEVELOPER_PATH,
-  SETTINGS_ABOUT_PATH,
+
+  CREATE_PATH,
+
 } from './paths';
 import { trimLeadingSlash, trimTrailingSlash } from '../utils/common';
 import { HashRouterConfig } from '../hooks/useClientConfig';
@@ -164,6 +158,8 @@ export const getExploreServerPath = (server: string): string => {
   };
   return generatePath(EXPLORE_SERVER_PATH, params);
 };
+
+export const getCreatePath = (): string => CREATE_PATH;
 
 export const getInboxPath = (): string => INBOX_PATH;
 export const getInboxNotificationsPath = (): string => INBOX_NOTIFICATIONS_PATH;

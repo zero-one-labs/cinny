@@ -28,10 +28,19 @@ import {
   NavItemContent,
   NavLink,
 } from '../../../components/nav';
-import { getExplorePath, getHomeRoomPath, getHomeSearchPath, getDirectRoomPath, getHomeCreatePath } from '../../pathUtils';
+
+import {
+  getExplorePath,
+  getHomeCreatePath,
+  getHomeRoomPath,
+  getHomeSearchPath,
+} from '../../pathUtils';
 import { getCanonicalAliasOrRoomId } from '../../../utils/matrix';
 import { useSelectedRoom } from '../../../hooks/router/useSelectedRoom';
-import { useHomeSearchSelected } from '../../../hooks/router/useHomeSelected';
+import {
+  useHomeCreateSelected,
+  useHomeSearchSelected,
+} from '../../../hooks/router/useHomeSelected';
 import { useHomeRooms } from './useHomeRooms';
 import { useDirectRooms } from '../direct/useDirectRooms';
 import { useMatrixClient } from '../../../hooks/useMatrixClient';
@@ -42,7 +51,8 @@ import { makeNavCategoryId } from '../../../state/closedNavCategories';
 import { roomToUnreadAtom } from '../../../state/room/roomToUnread';
 import { useCategoryHandler } from '../../../hooks/useCategoryHandler';
 import { useNavToActivePathMapper } from '../../../hooks/useNavToActivePathMapper';
-import { openCreateRoom, openJoinAlias, openInviteUser } from '../../../../client/action/navigation';
+
+import { openJoinAlias } from '../../../../client/action/navigation';
 import { PageNav, PageNavHeader, PageNavContent } from '../../../components/page';
 import { useRoomsUnread } from '../../../state/hooks/unread';
 import { markAsRead } from '../../../../client/action/notifications';
@@ -81,8 +91,8 @@ const HomeMenu = forwardRef<HTMLDivElement, HomeMenuProps>(({ requestClose }, re
   };
 
   return (
-    <Menu ref={ref} style={{ minWidth: toRem(200) }}>
-      <Box direction="Column" gap="100" style={{ padding: config.space.S200 }}>
+    <Menu ref={ref} style={{ maxWidth: toRem(160), width: '100vw' }}>
+      <Box direction="Column" gap="100" style={{ padding: config.space.S100 }}>
         <MenuItem
           onClick={handleMarkAsRead}
           size="300"
@@ -182,7 +192,7 @@ function HomeEmpty() {
         }
         options={
           <>
-            <Button onClick={() => openCreateRoom()} variant="Secondary" size="300">
+            <Button onClick={() => navigate(getHomeCreatePath())} variant="Secondary" size="300">
               <Text size="B300" truncate>
                 Create Room
               </Text>
@@ -352,9 +362,12 @@ export function Home() {
   const directs = useDirectRooms();
   const notificationPreferences = useRoomsNotificationPreferencesContext();
   const roomToUnread = useAtomValue(roomToUnreadAtom);
-  const screenSize = useScreenSizeContext();
+
+  const navigate = useNavigate();
+
 
   const selectedRoomId = useSelectedRoom();
+  const createRoomSelected = useHomeCreateSelected();
   const searchSelected = useHomeSearchSelected();
   const noRoomToDisplay = rooms.length === 0 && directs.length === 0;
   const [closedCategories, setClosedCategories] = useAtom(useClosedNavCategoriesAtom());
@@ -487,30 +500,59 @@ export function Home() {
         <HomeEmpty />
       ) : (
         <PageNavContent scrollRef={scrollRef}>
-          <Box direction="Column">
-            {/* Search input */}
-            <div className={css.searchContainer}>
-              <Input
-                className={css.searchInput}
-                variant="Surface"
-                size="400"
-                radii="400"
-                placeholder="Search messages"
-                before={<Icon size="100" src={Icons.Search} />}
-                value={searchQuery}
-                onChange={(evt) => setSearchQuery(evt.target.value)}
-              />
-            </div>
 
-            {/* Filter pills */}
-            <div className={css.filterPillsContainer}>
-              {renderFilterButton('all', 'All')}
-              {renderFilterButton('unread', 'Unread')}
-              {renderFilterButton('dms', 'DMs')}
-              {renderFilterButton('groups', 'Groups')}
-            </div>
+          <Box direction="Column" gap="300">
+            <NavCategory>
+              <NavItem variant="Background" radii="400" aria-selected={createRoomSelected}>
+                <NavButton onClick={() => navigate(getHomeCreatePath())}>
+                  <NavItemContent>
+                    <Box as="span" grow="Yes" alignItems="Center" gap="200">
+                      <Avatar size="200" radii="400">
+                        <Icon src={Icons.Plus} size="100" />
+                      </Avatar>
+                      <Box as="span" grow="Yes">
+                        <Text as="span" size="Inherit" truncate>
+                          Create Room
+                        </Text>
+                      </Box>
+                    </Box>
+                  </NavItemContent>
+                </NavButton>
+              </NavItem>
+              <NavItem variant="Background" radii="400">
+                <NavButton onClick={() => openJoinAlias()}>
+                  <NavItemContent>
+                    <Box as="span" grow="Yes" alignItems="Center" gap="200">
+                      <Avatar size="200" radii="400">
+                        <Icon src={Icons.Link} size="100" />
+                      </Avatar>
+                      <Box as="span" grow="Yes">
+                        <Text as="span" size="Inherit" truncate>
+                          Join with Address
+                        </Text>
+                      </Box>
+                    </Box>
+                  </NavItemContent>
+                </NavButton>
+              </NavItem>
+              <NavItem variant="Background" radii="400" aria-selected={searchSelected}>
+                <NavLink to={getHomeSearchPath()}>
+                  <NavItemContent>
+                    <Box as="span" grow="Yes" alignItems="Center" gap="200">
+                      <Avatar size="200" radii="400">
+                        <Icon src={Icons.Search} size="100" filled={searchSelected} />
+                      </Avatar>
+                      <Box as="span" grow="Yes">
+                        <Text as="span" size="Inherit" truncate>
+                          Message Search
+                        </Text>
+                      </Box>
+                    </Box>
+                  </NavItemContent>
+                </NavLink>
+              </NavItem>
+            </NavCategory>
 
-            {/* Room list */}
             <NavCategory>
               <div
                 style={{

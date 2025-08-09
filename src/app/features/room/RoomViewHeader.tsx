@@ -34,7 +34,7 @@ import { RoomTopicViewer } from '../../components/room-topic-viewer';
 import { StateEvent } from '../../../types/matrix/room';
 import { useMatrixClient } from '../../hooks/useMatrixClient';
 import { useRoom } from '../../hooks/useRoom';
-import { useSetSetting, useSetting } from '../../state/hooks/settings';
+import { useSetting } from '../../state/hooks/settings';
 import { settingsAtom } from '../../state/settings';
 import { useSpaceOptionally } from '../../hooks/useSpace';
 import { getHomeSearchPath, getSpaceSearchPath, withSearchParam } from '../../pages/pathUtils';
@@ -108,8 +108,8 @@ const RoomMenu = forwardRef<HTMLDivElement, RoomMenuProps>(({ room, requestClose
   };
 
   return (
-    <Menu ref={ref} style={{ minWidth: toRem(200) }}>
-      <Box direction="Column" gap="100" style={{ padding: config.space.S200 }}>
+    <Menu ref={ref} style={{ maxWidth: toRem(160), width: '100vw' }}>
+      <Box direction="Column" gap="100" style={{ padding: config.space.S100 }}>
         <MenuItem
           onClick={handleMarkAsRead}
           size="300"
@@ -144,7 +144,7 @@ const RoomMenu = forwardRef<HTMLDivElement, RoomMenuProps>(({ room, requestClose
         </RoomNotificationModeSwitcher>
       </Box>
       <Line variant="Surface" size="300" />
-      <Box direction="Column" gap="100" style={{ padding: config.space.S200 }}>
+      <Box direction="Column" gap="100" style={{ padding: config.space.S100 }}>
         <MenuItem
           onClick={handleInvite}
           variant="Primary"
@@ -207,7 +207,7 @@ const RoomMenu = forwardRef<HTMLDivElement, RoomMenuProps>(({ room, requestClose
         </UseStateProvider>
       </Box>
       <Line variant="Surface" size="300" />
-      <Box direction="Column" gap="100" style={{ padding: config.space.S200 }}>
+      <Box direction="Column" gap="100" style={{ padding: config.space.S100 }}>
         <UseStateProvider initial={false}>
           {(promptLeave, setPromptLeave) => (
             <>
@@ -260,7 +260,7 @@ export function RoomViewHeader() {
     ? mxcUrlToHttp(mx, avatarMxc, useAuthentication, 96, 96, 'crop') ?? undefined
     : undefined;
 
-  const setPeopleDrawer = useSetSetting(settingsAtom, 'isPeopleDrawer');
+  const [peopleDrawer, setPeopleDrawer] = useSetting(settingsAtom, 'isPeopleDrawer');
 
   const handleSearchClick = () => {
     const searchParams: _SearchPathSearchParams = {
@@ -434,7 +434,7 @@ export function RoomViewHeader() {
               offset={4}
               tooltip={
                 <Tooltip>
-                  <Text>Members</Text>
+                  <Text>{peopleDrawer ? 'Hide Members' : 'Show Members'}</Text>
                 </Tooltip>
               }
             >

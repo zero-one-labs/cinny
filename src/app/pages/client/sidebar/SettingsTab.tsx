@@ -28,8 +28,9 @@ export function SettingsTab() {
   const openSettings = () => navigate(getSettingsPath());
 
   return (
-    <SidebarItem active={isSettingsActive}>
-      <SidebarItemTooltip tooltip={displayName}>
+
+    <SidebarItem active={settings}>
+      <SidebarItemTooltip tooltip="User Settings">
         {(triggerRef) => (
           <SidebarAvatar as="button" ref={triggerRef} onClick={openSettings}>
             <UserAvatar
